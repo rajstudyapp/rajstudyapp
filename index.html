@@ -66,9 +66,18 @@
 </div>
 
 <script>
+  let savedData = JSON.parse(localStorage.getItem("rajStudyData")) || {};
+
+let studyTime = savedData.studyTime || 0;
+let streak = savedData.streak || 0;
+let weeklyData = savedData.weeklyData || [];
 let time = 1500;
 let timer = null;
-
+localStorage.setItem("rajStudyData", JSON.stringify({
+  studyTime: studyTime,
+  streak: streak,
+  weeklyData: weeklyData
+}));
 function getData() {
   return JSON.parse(localStorage.getItem("studyData")) || {
     date: new Date().toDateString(),
