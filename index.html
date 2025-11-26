@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Raj Study Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      margin: 0;
+      background: #121212;
+      color: white;
+      font-family: Arial;
+      text-align: center;
+      padding: 30px;
+    }
+    h1 {
+      font-size: 26px;
+    }
+    .timer {
+      font-size: 40px;
+      margin: 20px 0;
+    }
+    button {
+      padding: 12px 25px;
+      font-size: 16px;
+      border: none;
+      border-radius: 10px;
+      margin: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Raj Study Tracker</h1>
+  <p>Daily Focus Timer</p>
+
+  <div class="timer" id="time">25:00</div>
+
+  <button onclick="start()">Start</button>
+  <button onclick="reset()">Reset</button>
+
+  <script>
+    let time = 1500;
+    let timer;
+
+    function start() {
+      if (timer) return;
+      timer = setInterval(() => {
+        time--;
+        let m = Math.floor(time / 60);
+        let s = time % 60;
+        document.getElementById("time").innerText =
+          m + ":" + (s < 10 ? "0" : "") + s;
+
+        if (time <= 0) clearInterval(timer);
+      }, 1000);
+    }
+
+    function reset() {
+      clearInterval(timer);
+      timer = null;
+      time = 1500;
+      document.getElementById("time").innerText = "25:00";
+    }
+  </script>
+
+</body>
+</html>
