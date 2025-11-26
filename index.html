@@ -10,58 +10,132 @@
       color: white;
       font-family: Arial;
       text-align: center;
-      padding: 30px;
+      padding: 20px;
     }
-    h1 {
-      font-size: 26px;
+    h1 { font-size: 24px; }
+    .card {
+      background: #1e1e1e;
+      padding: 15px;
+      margin: 10px;
+      border-radius: 12px;
     }
     .timer {
-      font-size: 40px;
-      margin: 20px 0;
+      font-size: 36px;
+      margin: 10px 0;
     }
     button {
-      padding: 12px 25px;
-      font-size: 16px;
+      padding: 10px 18px;
+      font-size: 14px;
       border: none;
-      border-radius: 10px;
-      margin: 10px;
+      border-radius: 8px;
+      margin: 6px;
+    }
+    select {
+      padding: 8px;
+      border-radius: 6px;
     }
   </style>
 </head>
 <body>
 
-  <h1>Raj Study Tracker</h1>
-  <p>Daily Focus Timer</p>
+<h1>Raj Study Tracker</h1>
 
+<div class="card">
+  <h3>Today’s Timer</h3>
   <div class="timer" id="time">25:00</div>
-
+  <select id="category">
+    <option value="youtube">YouTube</option>
+    <option value="pw">PW App</option>
+    <option value="self">Self Study</option>
+  </select><br><br>
   <button onclick="start()">Start</button>
+  <button onclick="stop()">Stop</button>
   <button onclick="reset()">Reset</button>
+</div>
 
-  <script>
-    let time = 1500;
-    let timer;
+<div class="card">
+  <h3>Streak</h3>
+  <p id="streak">0 days</p>
+</div>
 
-    function start() {
-      if (timer) return;
-      timer = setInterval(() => {
-        time--;
-        let m = Math.floor(time / 60);
-        let s = time % 60;
-        document.getElementById("time").innerText =
-          m + ":" + (s < 10 ? "0" : "") + s;
+<div class="card">
+  <h3>Weekly Study (minutes)</h3>
+  <p>YouTube: <span id="wyt">0</span></p>
+  <p>PW: <span id="wpw">0</span></p>
+  <p>Self: <span id="wself">0</span></p>
+</div>
 
-        if (time <= 0) clearInterval(timer);
-      }, 1000);
-    }
+<script>
+let time = 1500;
+let timer = null;
 
-    function reset() {
-      clearInterval(timer);
-      timer = null;
-      time = 1500;
-      document.getElementById("time").innerText = "25:00";
-    }
-  </script>
+function getData() {
+  return JSON.parse(localStorage.getItem("studyData")) || {
+    date: new Date().toDateString(),
+    streak: 0,
+    week: { youtube: 0, pw: 0, self: 0 }
+  };
+}
+
+function saveData(data) {
+  localStorage.setItem("studyData", JSON.stringify(data));
+}
+
+function dailyResetCheck() {
+  let data = getData();
+  let today = new Date().toDateString();
+
+  if (data.date !== today) {
+    let total = data.week.youtube + data.week.pw + data.week.self;
+    if (total > 0) data.streak += 1;
+    data.date = today;
+    data.week = { youtube: 0, pw: 0, self: 0 };
+    saveData(data);
+  }
+}
+
+function updateUI() {
+  let data = getData();
+  document.getElementById("streak").innerText = data.streak + " days";
+  document.getElementById("wyt").innerText = data.week.youtube;
+  document.getElementById("wpw").innerText = data.week.pw;
+  document.getElementById("wself").innerText = data.week.self;
+}
+
+function start() {
+  if (timer) return;
+  timer = setInterval(() => {
+    time--;
+    let m = Math.floor(time / 60);
+    let s = time % 60;
+    document.getElementById("time").innerText =
+      m + ":" + (s < 10 ? "0" : "") + s;
+  }, 1000);
+}
+
+function stop() {
+  clearInterval(timer);
+  timer = null;
+
+  let mins = Math.floor((1500 - time) / 60);
+  let cat = document.getElementById("category").value;
+  let data = getData();
+
+  data.week[cat] += mins;
+  saveData(data);
+  updateUI();
+}
+
+function reset() {
+  clearInterval(timer);
+  timer = null;
+  time = 1500;
+  document.getElementById("time").innerText = "25:00";
+}
+
+dailyResetCheck();
+updateUI();
+</script>
 
 </body>
 </html>
